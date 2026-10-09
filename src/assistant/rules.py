@@ -15,15 +15,27 @@ def load_offices(path: Path = DATA_DIR / "offices.csv") -> dict[str, dict[str, s
         return {row["name"].lower(): row for row in csv.DictReader(f)}
 
 
+
 def reply(message: str, offices: dict[str, dict[str, str]] | None = None) -> str:
     """Answer a message with simple rules."""
     text = message.strip().lower().rstrip("?!.")
     if not text:
         return "Please type a question."
+
+    if text == "help":
+        return (
+            "Available commands:\n"
+            "- hi, hello, hey: Get a greeting.\n"
+            "- help: Show available commands.\n"
+            "- Ask about an office to find its room and opening hours."
+        )
+
     if text in GREETINGS:
         return "Hello! Ask me where an office is, or when it opens."
+
     offices = offices if offices is not None else load_offices()
     for name, row in offices.items():
         if name in text:
             return f"{row['name']}: room {row['room']}, open {row['hours']}."
+
     return "I don't know that yet. Try asking about an office, e.g. 'training office'."
